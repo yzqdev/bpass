@@ -26,9 +26,10 @@ func main() {
 	//是否开启GUI模式
 	//判断是否安装谷歌浏览器
 	ChromeExe := lorca.ChromeExecutable()
-	if ChromeExe != "" {
+	if ChromeExe == "" {
 		//打开UI界面
-		execUI()
+		print("打开ui界面")
+		//execUI()
 	} else {
 		//打开浏览器
 		go func() {

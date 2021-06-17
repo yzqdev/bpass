@@ -1,4 +1,4 @@
-# 百灵快传（B0Pass）
+# bpass（B0Pass）
 
 LAN large file transfer tool。
 
