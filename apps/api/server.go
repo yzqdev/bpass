@@ -44,7 +44,7 @@ func GetTextData(r *ghttp.Request) {
 	saveData(r, "data", "data_text")
 }
 
-// saveData 保存数据
+// saveData 保存数据到文件
 func saveData(r *ghttp.Request, getkey string, dbkey string) {
 	getData := r.GetFormString(getkey)
 	getCode := r.GetFormString("code")
@@ -54,7 +54,4 @@ func saveData(r *ghttp.Request, getkey string, dbkey string) {
 	dbData := fileinfos.Get(dbkey)
 	//dbData:=time.Now().Format("2006-01-02")
 	response.JSON(r, 0, "ok", dbData)
-}
-func GetGlobalData(r *ghttp.Request) {
-
 }

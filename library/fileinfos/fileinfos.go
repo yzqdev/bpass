@@ -68,6 +68,23 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
+// FormatFileSize 字节的单位转换 保留两位小数
+func FormatFileSize(fileSize  int64) (size string) {
+	if fileSize < 1024 {
+		//return strconv.FormatInt(fileSize, 10) + "B"
+		return fmt.Sprintf("%.2fB", float64(fileSize)/float64(1))
+	} else if fileSize < (1024 * 1024) {
+		return fmt.Sprintf("%.2fKB", float64(fileSize)/float64(1024))
+	} else if fileSize < (1024 * 1024 * 1024) {
+		return fmt.Sprintf("%.2fMB", float64(fileSize)/float64(1024*1024))
+	} else if fileSize < (1024 * 1024 * 1024 * 1024) {
+		return fmt.Sprintf("%.2fGB", float64(fileSize)/float64(1024*1024*1024))
+	} else if fileSize < (1024 * 1024 * 1024 * 1024 * 1024) {
+		return fmt.Sprintf("%.2fTB", float64(fileSize)/float64(1024*1024*1024*1024))
+	} else { //if fileSize < (1024 * 1024 * 1024 * 1024 * 1024 * 1024)
+		return fmt.Sprintf("%.2fEB", float64(fileSize)/float64(1024*1024*1024*1024*1024))
+	}
+}
 func GetSize(fileBytes uint64) string {
 	var (
 		units []string
@@ -80,7 +97,7 @@ func GetSize(fileBytes uint64) string {
 		i++
 		fileBytes = fileBytes / 1024
 		if fileBytes < 1024 {
-			size = fmt.Sprintf("%d", fileBytes) + units[i]
+			size = fmt.Sprintf("%v", fileBytes) + units[i]
 			break
 		}
 	}
@@ -121,8 +138,8 @@ func ListDirData(fp, fpSub string) []map[string]string {
 		m["name"] = mfile
 		m["ext"] = mext
 		m["size"] = strconv.Itoa(int(fileInfo.Size()))
-		m["sizes"] = GetSize(uint64(fileInfo.Size()))
-		m["date"] = fileInfo.ModTime().Format("01-02")
+		m["sizes"] = FormatFileSize(fileInfo.Size())
+		m["date"] = fileInfo.ModTime().Format("2006-01-02 15:04:05")
 		m["path"] = fpSub + "/" + mfile
 		m["type"] = mtype
 		m["indexs"] = strconv.Itoa(indexs)

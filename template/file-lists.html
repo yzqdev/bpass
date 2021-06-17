@@ -81,11 +81,13 @@
                              alt="${.name}"/>
                         ${else}
                         <a class="filebox" onclick="openView('${.name}','${.path}','${.type}')">
-                            <span>${.ext}</span> </a>
+                            <span>${.ext}</span>
+                        </a>
                         ${end}
 
 
                     </p>
+                    <div class="inline-small" style="text-align: center"> ${.date}</div>
                     <div class="inline-small" style="margin-top:10px;">
                         <div>${.sizes}</div>
                         <div class="right-span">
