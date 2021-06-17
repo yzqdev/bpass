@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+
 var (
 	PathRoot string
 	ServPort int
@@ -18,7 +19,7 @@ var (
 func ExecArgs() {
 	flag.Parse()
 	if ServPort <= 0 {
-		ServPort = g.Config().GetInt("setting.port")
+		ServPort =g.Cfg().GetInt("setting.port")
 	}
 }
 
@@ -26,7 +27,7 @@ func ExecArgs() {
 func init() {
 
 	// 分析CLI参数
-	flag.IntVar(&ServPort, "p", 8899, "-p for Server Port(default=8899)")
+	flag.IntVar(&ServPort, "p", ServPort, "-p for Server Port(default=8899)")
 	ExecArgs()
 
 	// 资源根目录
