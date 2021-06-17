@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// 获取当前可执行文件的路径
+// GetBinPath 获取当前可执行文件的路径
 func GetBinPath() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -22,7 +22,7 @@ func GetBinPath() string {
 	return str
 }
 
-// 获取当前代码文件路径
+// GetCodePath 获取当前代码文件路径
 func GetCodePath() string {
 	_, file, _, ok := runtime.Caller(1)
 	if !ok {
@@ -31,7 +31,7 @@ func GetCodePath() string {
 	return filepath.Dir(file)
 }
 
-// getRootPath
+// 获取根目录
 func GetRootPath() string {
 	var fp string
 	//fmt.Println("os.Args >>>>> ",os.Args[0][0],os.Args)
