@@ -16,15 +16,22 @@ func OpenUrl(r *ghttp.Request) {
 	_ = openurl.Open(getUrl)
 }
 
-// GetIp 获取IP地址
-func GetIp(r *ghttp.Request) {
+// GlobalData 获取IP地址
+func GlobalData(r *ghttp.Request) {
+
 	port := boot.ServPort
+	pathRoot := fileinfos.GetRootPath() + "/files/"
 	ip, _ := ipaddress.GetIP()
 	var ips []string
 	for _, pp := range ip {
 		ips = append(ips, pp+":"+strconv.Itoa(port))
 	}
-	response.JSON(r, 0, "ok", ips)
+
+	data := map[string]interface{}{
+		"ips":      ips,
+		"pathRoot": pathRoot,
+	}
+	response.JSON(r, 0, "ok", data)
 }
 
 // GetSubPath GetPathSub 上传目录记忆功能
@@ -47,4 +54,7 @@ func saveData(r *ghttp.Request, getkey string, dbkey string) {
 	dbData := fileinfos.Get(dbkey)
 	//dbData:=time.Now().Format("2006-01-02")
 	response.JSON(r, 0, "ok", dbData)
+}
+func GetGlobalData(r *ghttp.Request) {
+
 }

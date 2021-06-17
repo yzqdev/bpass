@@ -29,10 +29,12 @@ func init() {
 		g.GET("/dump", api.Dump)
 		g.GET("/upload", api.UploadShow)
 		//server
-		g.GET("/sip", api.GetIp)
+		g.GET("/globalData", api.GlobalData)
 		g.ALL("/subpath", api.GetSubPath)
 		g.ALL("/textdata", api.GetTextData)
 		g.GET("/openurl", api.OpenUrl)
+
+
 	})
 
 }

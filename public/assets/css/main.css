@@ -34,6 +34,24 @@ body{
     width: 100%;
     min-height: 100%;
 }
+
+::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    width : 10px;  /*高宽分别对应横竖滚动条的尺寸*/
+    height: 10px;
+}
+::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background   : rgba(144,147,153,.3);
+}
+::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    box-shadow   : inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    background   : #ededed;
+}
 .login-bg{
     /*background: #eeeeee url() 0 0 no-repeat;*/
     background:url(../images/bg.jpg) no-repeat center;
@@ -237,9 +255,7 @@ body{
 .container .layui-nav-item{
     line-height: 45px;
 }
-.container .layui-nav-more{
-    top: 20px;
-}
+
 .container .layui-nav-child{
     top: 50px;
 }
@@ -710,23 +726,20 @@ img {
 
 /* DIY */
 .home-index-tips{
-    clear: both;
-    width:242px;
+    display: flex;
     margin: 0 auto;
     text-align: left;
-    margin-bottom: 20px;
+
 }
 .home-index-tips-left{
-    float: left;
-    width:192px;
+
+
     white-space: nowrap;
     text-overflow:ellipsis;
     overflow:hidden;
 }
 .home-index-tips-right{
-    float: right;
-    width:48px;
-    text-align: right
+
 }
 .layui-nav .layui-this:after, .layui-nav-bar, .layui-nav-tree .layui-nav-itemed:after {
     background-color: #409eff;
@@ -766,11 +779,10 @@ img {
     font-size: 12px;
 }
 .filebox{
-    height: 38px;
-    width: 40%;
+     padding: 10px 20px;
     line-height:36px;
-    margin: 0 auto;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
+    cursor: pointer;
     text-align: center;
     background-color: #01AAED;
     border:1px solid #ddd;
