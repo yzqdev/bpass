@@ -4,3 +4,4 @@ tmp
 *.log
 boot/resource.go
 bin
+go.sum
