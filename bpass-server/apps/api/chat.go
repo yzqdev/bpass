@@ -1,4 +1,4 @@
-package chat
+package api
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"github.com/gogf/gf/container/gset"
 	"github.com/gogf/gf/encoding/ghtml"
 	"github.com/gogf/gf/encoding/gjson"
-	"github.com/gogf/gf/frame/gmvc"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/os/gcache"
 	"github.com/gogf/gf/os/glog"
@@ -17,10 +16,6 @@ import (
 )
 
 // Controller 控制器结构体
-type Controller struct {
-	gmvc.Controller
-	ws *ghttp.WebSocket
-}
 
 // Msg 消息结构体
 type Msg struct {
@@ -37,6 +32,7 @@ const (
 )
 
 var (
+	ws *ghttp.WebSocket
 	// 使用默认的并发安全Map
 	users = gmap.New()
 	// 使用并发安全的Set，用以用户昵称唯一性校验
@@ -46,18 +42,18 @@ var (
 )
 
 // Index 聊天室首页，只显示模板内容
-func (c *Controller) Index() {
+func ChatIndex(c *ghttp.Request) {
 	log.Println(c.Session.Id())
 	if !c.Session.Contains("chat_name") {
 		_ = c.Session.Set("chat_name", c.Session.Id())
 	}
-	c.View.Assign("tplMain", "chat/include/chat.html")
-	_ = c.View.Display("chat/index.html")
+	//c.View.Assign("tplMain", "chat/include/chat.html")
+	//_ = c.View.Display("chat/index.html")
 }
 
 // SetName 设置响当当的名字
-func (c *Controller) SetName() {
-	name := c.Request.GetString("name")
+func SetName(c *ghttp.Request) {
+	name := c.GetString("name")
 	name = ghtml.Entities(name)
 
 	_ = c.Session.Set("chat_name_temp", name)
@@ -76,15 +72,14 @@ func (c *Controller) SetName() {
 }
 
 // WebSocket 接口
-func (c *Controller) WebSocket() {
+func ChatWebSocket(c *ghttp.Request) {
 	msg := &Msg{}
 
 	// 初始化WebSocket请求
-	if ws, err := c.Request.WebSocket(); err == nil {
-		c.ws = ws
-	} else {
+	ws, err := c.WebSocket()
+	if err != nil {
 		glog.Error(err)
-		return
+		c.Exit()
 	}
 
 	name := c.Session.GetString("chat_name")
@@ -94,30 +89,30 @@ func (c *Controller) WebSocket() {
 
 	// 初始化时设置用户昵称为当前链接信息
 	names.Add(name)
-	users.Set(c.ws, name)
+	users.Set(ws, name)
 
 	// 初始化后向所有客户端发送上线消息
-	_ = c.writeUsers()
+	_ = chatWriteUsers()
 
 	for {
 		// 阻塞读取WS数据
-		_, msgByte, err := c.ws.ReadMessage()
+		_, msgByte, err := ws.ReadMessage()
 		if err != nil {
 			// 如果失败，那么表示断开，这里清除用户信息
 			names.Remove(name)
-			users.Remove(c.ws)
+			users.Remove(ws)
 			// 通知所有客户端当前用户已下线
-			_ = c.writeUsers()
+			_ = chatWriteUsers()
 			break
 		}
 		// JSON参数解析
 		if err := gjson.DecodeTo(msgByte, msg); err != nil {
-			_ = c.write(Msg{"error", "消息格式不正确: " + err.Error(), ""})
+			_ = write(Msg{"error", "消息格式不正确: " + err.Error(), ""})
 			continue
 		}
 		// 数据校验
 		if e := gvalid.CheckStruct(context.TODO(), msg, nil); e != nil {
-			_ = c.write(Msg{"error", e.String(), ""})
+			_ = write(Msg{"error", e.String(), ""})
 			continue
 		}
 		msg.From = name
@@ -138,7 +133,7 @@ func (c *Controller) WebSocket() {
 			//}
 			// 有消息时，群发消息
 			if msg.Data != nil {
-				if err = c.writeGroup(
+				if err = chatWriteGroup(
 					Msg{"send",
 						ghtml.SpecialChars("【群发】" + gconv.String(msg.Data)),
 						ghtml.SpecialChars(msg.From)}); err != nil {
@@ -150,16 +145,16 @@ func (c *Controller) WebSocket() {
 }
 
 // 向客户端写入消息
-func (c *Controller) write(msg Msg) error {
+func write(msg Msg) error {
 	b, err := gjson.Encode(msg)
 	if err != nil {
 		return err
 	}
-	return c.ws.WriteMessage(ghttp.WS_MSG_TEXT, []byte(b))
+	return ws.WriteMessage(ghttp.WS_MSG_TEXT, []byte(b))
 }
 
 // 群发消息
-func (c *Controller) writeGroup(msg Msg) error {
+func chatWriteGroup(msg Msg) error {
 	b, err := gjson.Encode(msg)
 	if err != nil {
 		return err
@@ -174,13 +169,13 @@ func (c *Controller) writeGroup(msg Msg) error {
 }
 
 // 向客户端返回用户列表
-func (c *Controller) writeUsers() error {
+func chatWriteUsers() error {
 	array := garray.NewSortedStrArray()
 	names.Iterator(func(v string) bool {
 		array.Add(v)
 		return true
 	})
-	if err := c.writeGroup(Msg{"list", array.Slice(), ""}); err != nil {
+	if err := chatWriteGroup(Msg{"list", array.Slice(), ""}); err != nil {
 		return err
 	}
 	return nil

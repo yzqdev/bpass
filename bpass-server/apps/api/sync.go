@@ -2,8 +2,6 @@ package api
 
 import (
 	"b0pass/library/response"
-	"github.com/gogf/gf/container/gmap"
-	"github.com/gogf/gf/container/gset"
 	"github.com/gogf/gf/frame/gmvc"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/os/glog"
@@ -15,8 +13,8 @@ type SyncController struct {
 }
 
 var (
-	users = gmap.New()
-	names = gset.NewStrSet()
+//users = gmap.New()
+//names = gset.NewStrSet()
 )
 
 // Index 触发页面
