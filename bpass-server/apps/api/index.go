@@ -1,24 +1,24 @@
-package index
+package api
 
 import (
 	"b0pass/boot"
 	"b0pass/library/fileinfos"
 	"b0pass/library/ipaddress"
-	"github.com/gogf/gf/frame/gmvc"
+	"b0pass/library/response"
+	"github.com/gogf/gf/net/ghttp"
+
 	"strconv"
 	"time"
 )
 
-type Controller struct {
-	gmvc.Controller
+func Index(r *ghttp.Request) {
+	data := map[string]interface{}{
+		"times": time.Now().Unix(),
+	}
+	response.JSON(r, 200, "success", data)
 }
 
-func (c *Controller) Index() {
-	c.View.Assign("times", time.Now().Unix())
-	_ = c.View.Display("index.html")
-}
-
-func (c *Controller) FileLists() {
+func FileLists(r *ghttp.Request) {
 	// Ip lists
 	port := boot.ServPort
 	ip, _ := ipaddress.GetIP()
@@ -26,12 +26,12 @@ func (c *Controller) FileLists() {
 	for _, pp := range ip {
 		ips = append(ips, pp+":"+strconv.Itoa(port))
 	}
-	c.View.Assign("ips", ips)
+
 	// path
 	pathRoot := fileinfos.GetRootPath() + "/files/"
-	c.View.Assign("path_root", pathRoot)
+
 	// file lists
-	fprPath := c.Request.GetString("path")
+	fprPath := r.GetString("path")
 	var fpPath string
 	if fprPath != "" {
 		fpPath = "/files" + fprPath + "/*"
@@ -40,7 +40,13 @@ func (c *Controller) FileLists() {
 	}
 	fp := fileinfos.GetRootPath() + fpPath
 	flists := fileinfos.ListDirData(fp, fprPath)
-	c.View.Assign("flists", flists)
+
 	// views
-	_ = c.View.Display("file-lists.html")
+	data := map[string]interface{}{
+		"ips":       ips,
+		"pathRoot":  pathRoot,
+		"fileLists": flists,
+	}
+	response.JSON(r, 200, "成功", data)
+
 }

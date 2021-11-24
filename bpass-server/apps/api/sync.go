@@ -1,6 +1,7 @@
-package sync
+package api
 
 import (
+	"b0pass/library/response"
 	"github.com/gogf/gf/container/gmap"
 	"github.com/gogf/gf/container/gset"
 	"github.com/gogf/gf/frame/gmvc"
@@ -8,7 +9,7 @@ import (
 	"github.com/gogf/gf/os/glog"
 )
 
-type Controller struct {
+type SyncController struct {
 	gmvc.Controller
 	ws *ghttp.WebSocket
 }
@@ -20,57 +21,57 @@ var (
 
 // Index 触发页面
 // /sync/
-func (c *Controller) Index() {
-	if !c.Session.Contains("clientId") {
-		_ = c.Session.Set("clientId", c.Session.Id())
+func SyncIndex(r *ghttp.Request) {
+	if !r.Session.Contains("clientId") {
+		_ = r.Session.Set("clientId", r.Session.Id())
 	}
-	_ = c.View.Display("sync.html")
+	response.JSON(r, 200, "成功", "nodata")
+
 }
 
 // WebSocket 接口
 // /sync/web-socket
-func (c *Controller) WebSocket() {
+func WebSocket(r *ghttp.Request) {
 
 	// 初始化WebSocket请求
-	if ws, err := c.Request.WebSocket(); err == nil {
-		c.ws = ws
-	} else {
+	ws, err := r.WebSocket()
+	if err != nil {
 		glog.Error(err)
-		return
+		r.Exit()
 	}
 
 	// 初始化时设置用户信息
-	clientId := c.Session.GetString("clientId")
+	clientId := r.Session.GetString("clientId")
 	if clientId == "" {
-		_ = c.Session.Set("clientId", c.Session.Id())
+		_ = r.Session.Set("clientId", r.Session.Id())
 	}
-	users.Set(c.ws, clientId)
+	users.Set(ws, clientId)
 	names.Add(clientId)
 
 	for {
 		// 阻塞读取WS数据
-		msgType, msg, err := c.ws.ReadMessage()
+		msgType, msg, err := ws.ReadMessage()
 		if err != nil {
-			users.Remove(c.ws)
+			users.Remove(ws)
 			names.Remove(clientId)
 			break
 		}
 
 		// 群发同步所有端
 		glog.Cat("sync").Println("[sync] ", clientId, msg)
-		_ = c.writeUsers()
+		_ = writeUsers()
 		if msg != nil {
 			msgs := "{" +
 				"\"clientId\":\"" + clientId + "\"," +
 				"\"msg\":\"" + string(msg) + "\"" +
 				"}"
-			_ = c.writeGroup(msgType, msgs)
+			_ = writeGroup(msgType, msgs)
 		}
 	}
 }
 
 // 群发消息
-func (c *Controller) writeGroup(msgType int, msg string) error {
+func writeGroup(msgType int, msg string) error {
 	msgs := []byte(msg)
 	users.RLockFunc(func(m map[interface{}]interface{}) {
 		for user := range m {
@@ -81,7 +82,7 @@ func (c *Controller) writeGroup(msgType int, msg string) error {
 }
 
 // 向客户端返回用户列表
-func (c *Controller) writeUsers() error {
+func writeUsers() error {
 	nameStr := ""
 	names.Iterator(func(v string) bool {
 		if nameStr == "" {
@@ -95,7 +96,7 @@ func (c *Controller) writeUsers() error {
 		"\"clientId\":\"0\"," +
 		"\"msg\":\"" + nameStr + "\"" +
 		"}"
-	if err := c.writeGroup(1, msgs); err != nil {
+	if err := writeGroup(1, msgs); err != nil {
 		return err
 	}
 	return nil
