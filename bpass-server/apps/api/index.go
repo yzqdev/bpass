@@ -45,7 +45,7 @@ func FileLists(r *ghttp.Request) {
 	data := map[string]interface{}{
 		"ips":       ips,
 		"pathRoot":  pathRoot,
-		"fileLists": flists,
+		"fileList": flists,
 	}
 	response.JSON(r, 200, "成功", data)
 

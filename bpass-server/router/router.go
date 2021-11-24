@@ -4,17 +4,19 @@ import (
 	"b0pass/apps/api"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
+	"github.com/gookit/color"
 )
 
 func init() {
 	s := g.Server()
 
 	// Index
-
+color.Redln("刀刀赚了")
 	// Chat
 	//s.BindHandler("/chat", new(chat.Controller))
-	s.BindHandler("/sync ", api.SyncIndex)
+	//s.BindHandler("/sync ", api.SyncIndex)
 	s.Group("/", func(group *ghttp.RouterGroup) {
+		group.Middleware(MiddlewareCORS)
 		group.Group("/", func(group *ghttp.RouterGroup) {
 			group.GET("/fileList", api.FileLists)
 			group.GET("/index", api.Index)
@@ -22,7 +24,7 @@ func init() {
 
 		group.Group("/api", func(g *ghttp.RouterGroup) {
 			//cors
-			g.Middleware(MiddlewareCORS)
+
 			//file
 			g.POST("/upload", api.Upload)
 			g.GET("/lists", api.Lists)

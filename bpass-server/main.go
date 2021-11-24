@@ -3,7 +3,6 @@ package main
 import (
 	"b0pass/boot"
 	_ "b0pass/boot"
-	"b0pass/library/openurl"
 	_ "b0pass/router"
 	"fmt"
 	"github.com/gogf/gf/frame/g"
@@ -12,7 +11,6 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"strconv"
 	"time"
 )
 
@@ -34,7 +32,7 @@ func main() {
 		//打开浏览器
 		go func() {
 			time.Sleep(1000 * time.Millisecond)
-			_ = openurl.Open("http://127.0.0.1:" + strconv.Itoa(boot.ServPort))
+			//_ = openurl.Open("http://127.0.0.1:" + strconv.Itoa(boot.ServPort)+"/fileList")
 		}()
 		g.Wait()
 	}

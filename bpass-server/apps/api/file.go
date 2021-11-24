@@ -84,8 +84,12 @@ func Lists(r *ghttp.Request) {
 func Delete(r *ghttp.Request) {
 	f := r.Get("f")
 	fp := fileinfos.GetRootPath()
-	filePath := fp + gconv.String(f)
-	_ = os.RemoveAll(filePath)
+	filePath := fp +"/files/"+ gconv.String(f)
+	err := os.RemoveAll(filePath)
+	if err != nil {
+		response.JSON(r, 0, "failed", filePath)
+		return
+	}
 	response.JSON(r, 0, "ok", filePath)
 }
 

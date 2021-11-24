@@ -4,7 +4,6 @@ import (
 	"b0pass/library/fileinfos"
 	"flag"
 	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/os/gfile"
 	"github.com/gogf/gf/os/glog"
 	"time"
@@ -63,7 +62,6 @@ func init() {
 		s.SetWriteTimeout(3 * 60 * time.Second)
 		s.SetIdleTimeout(3 * 60 * time.Second)
 		s.SetMaxHeaderBytes(32 * 1024)
-		s.SetNameToUriType(ghttp.URI_TYPE_ALLLOWER)
 		s.SetErrorLogEnabled(true)
 		s.SetAccessLogEnabled(true)
 		s.SetPort(ServPort)

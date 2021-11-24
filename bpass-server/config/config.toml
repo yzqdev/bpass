@@ -1,4 +1,4 @@
 # 应用系统设置
 [setting]
     logpath = "tmp/log"
-    port    = 8900
+    port    = 8901
