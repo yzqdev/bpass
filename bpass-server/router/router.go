@@ -12,11 +12,11 @@ func init() {
 	s := g.Server()
 
 	// Index
-	s.BindController("/", new(index.Controller))
+	s.BindHandler("/", new(index.Controller))
 
 	// Chat
 	//s.BindController("/chat", new(chat.Controller))
-	s.BindController("/sync", new(sync.Controller))
+	s.BindHandler("/sync", new(sync.Controller))
 
 	// Api
 	s.Group("/api", func(g *ghttp.RouterGroup) {
@@ -33,7 +33,6 @@ func init() {
 		g.ALL("/subpath", api.GetSubPath)
 		g.ALL("/textdata", api.GetTextData)
 		g.GET("/openurl", api.OpenUrl)
-
 
 	})
 
