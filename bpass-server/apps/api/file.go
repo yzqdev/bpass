@@ -3,44 +3,54 @@ package api
 import (
 	"b0pass/library/fileinfos"
 	"b0pass/library/response"
+	"fmt"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/os/gfile"
 	"github.com/gogf/gf/util/gconv"
+	"github.com/gookit/color"
 	"io"
 	"log"
 	"os"
+	"reflect"
 )
 
 // Upload 执行文件上传处理
 func Upload(r *ghttp.Request) {
-	if err := r.ParseMultipartForm(32); err != nil {
-		response.JSON(r, 201, err.Error())
+	//if err := r.ParseMultipartForm(32); err != nil {
+	//	response.JSON(r, 201, err.Error())
+	//}
+	file := r.GetUploadFiles("file")
+
+	//defer func() { _ = file.close() }()
+
+	// Get path
+	pathSub := r.GetString("path")
+	fileinfos.Set("data_path", pathSub)
+	// Save path
+	savePath := fileinfos.GetRootPath() + "/files/" + pathSub + "/"
+	log.Println(savePath)
+	// Upload file
+	_, err := file.Save(savePath)
+	if err != nil {
+		response.JSON(r, 201, "ok", false)
+		color.Redln(err)
+		return
 	}
-	if f, h, e := r.FormFile("upload-file"); e == nil {
-		defer func() { _ = f.Close() }()
-		name := gfile.Basename(h.Filename)
-		size := h.Size
-		// Get path
-		pathSub := r.GetFormString("path")
-		fileinfos.Set("data_path", pathSub)
-		// Save path
-		savePath := fileinfos.GetRootPath() + "/files/" + pathSub + "/" + name
-		log.Println(savePath)
-		// Upload file
-		file, err := gfile.Create(savePath)
-		if err != nil {
-			r.Response.Write(err)
-			return
-		}
-		defer func() { _ = file.Close() }()
-		if _, err := io.Copy(file, f); err != nil {
-			response.JSON(r, 201, err.Error())
-			return
-		}
-		response.JSON(r, 0, "ok", size)
-	} else {
-		response.JSON(r, 201, e.Error())
+
+	response.JSON(r, 0, "ok", true)
+
+}
+func MultiUpload(r *ghttp.Request) {
+	file := r.GetUploadFiles("file")
+	fmt.Println(file)
+	savePath := fileinfos.GetRootPath() + "/files/" + " name"
+	_, err := file.Save(savePath)
+	if err != nil {
+		color.Redln("save fail")
+		return
 	}
+	// Upload file
+	fmt.Println(reflect.TypeOf(file))
 }
 
 // Upload 以小内存上传大文件
@@ -84,7 +94,7 @@ func Lists(r *ghttp.Request) {
 func Delete(r *ghttp.Request) {
 	f := r.Get("f")
 	fp := fileinfos.GetRootPath()
-	filePath := fp +"/files/"+ gconv.String(f)
+	filePath := fp + "/files/" + gconv.String(f)
 	err := os.RemoveAll(filePath)
 	if err != nil {
 		response.JSON(r, 0, "failed", filePath)

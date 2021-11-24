@@ -11,15 +11,16 @@ func init() {
 	s := g.Server()
 
 	// Index
-color.Redln("刀刀赚了")
+	color.Redln("刀刀赚了")
 	// Chat
-	//s.BindHandler("/chat", new(chat.Controller))
-	//s.BindHandler("/sync ", api.SyncIndex)
+	//s.BindHandler("/chat", new(chat.SyncController))
+	s.BindObject("/sync ", new(api.SyncController))
 	s.Group("/", func(group *ghttp.RouterGroup) {
 		group.Middleware(MiddlewareCORS)
 		group.Group("/", func(group *ghttp.RouterGroup) {
 			group.GET("/fileList", api.FileLists)
 			group.GET("/index", api.Index)
+			group.POST("/upload", api.MultiUpload)
 		})
 
 		group.Group("/api", func(g *ghttp.RouterGroup) {

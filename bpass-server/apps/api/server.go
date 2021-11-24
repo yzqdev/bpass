@@ -39,6 +39,11 @@ func GetSubPath(r *ghttp.Request) {
 	saveData(r, "path", "data_path")
 }
 
+type Text struct {
+	Data string `json:"data"`
+	Code string `json:"code"`
+}
+
 // GetTextData 文本内容共享
 func GetTextData(r *ghttp.Request) {
 	saveData(r, "data", "data_text")
@@ -46,8 +51,13 @@ func GetTextData(r *ghttp.Request) {
 
 // saveData 保存数据到文件
 func saveData(r *ghttp.Request, getkey string, dbkey string) {
-	getData := r.GetFormString(getkey)
-	getCode := r.GetFormString("code")
+	var req *Text
+	if err := r.Parse(&req); err != nil {
+		response.JSON(r, 400, "二重唱")
+		return
+	}
+	getData := req.Data
+	getCode := req.Code
 	if getCode == "1" {
 		fileinfos.Set(dbkey, getData)
 	}

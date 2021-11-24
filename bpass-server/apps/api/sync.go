@@ -1,41 +1,35 @@
 package api
 
 import (
-	"b0pass/library/response"
-	"github.com/gogf/gf/frame/gmvc"
 	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/os/glog"
 )
 
 type SyncController struct {
-	gmvc.Controller
 	ws *ghttp.WebSocket
 }
 
-var (
-//users = gmap.New()
-//names = gset.NewStrSet()
-)
+var ()
 
 // Index 触发页面
 // /sync/
-func SyncIndex(r *ghttp.Request) {
+func (c *SyncController) Index(r *ghttp.Request) {
 	if !r.Session.Contains("clientId") {
 		_ = r.Session.Set("clientId", r.Session.Id())
 	}
-	response.JSON(r, 200, "成功", "nodata")
-
+	//_ = c.View.Display("sync.html")
 }
 
 // WebSocket 接口
 // /sync/web-socket
-func WebSocket(r *ghttp.Request) {
+func (c *SyncController) WebSocket(r *ghttp.Request) {
 
 	// 初始化WebSocket请求
-	ws, err := r.WebSocket()
-	if err != nil {
+	if ws, err := r.WebSocket(); err == nil {
+		c.ws = ws
+	} else {
 		glog.Error(err)
-		r.Exit()
+		return
 	}
 
 	// 初始化时设置用户信息
@@ -43,33 +37,33 @@ func WebSocket(r *ghttp.Request) {
 	if clientId == "" {
 		_ = r.Session.Set("clientId", r.Session.Id())
 	}
-	users.Set(ws, clientId)
+	users.Set(c.ws, clientId)
 	names.Add(clientId)
 
 	for {
 		// 阻塞读取WS数据
-		msgType, msg, err := ws.ReadMessage()
+		msgType, msg, err := c.ws.ReadMessage()
 		if err != nil {
-			users.Remove(ws)
+			users.Remove(c.ws)
 			names.Remove(clientId)
 			break
 		}
 
 		// 群发同步所有端
 		glog.Cat("sync").Println("[sync] ", clientId, msg)
-		_ = writeUsers()
+		_ = c.writeUsers()
 		if msg != nil {
 			msgs := "{" +
 				"\"clientId\":\"" + clientId + "\"," +
 				"\"msg\":\"" + string(msg) + "\"" +
 				"}"
-			_ = writeGroup(msgType, msgs)
+			_ = c.writeGroup(msgType, msgs)
 		}
 	}
 }
 
 // 群发消息
-func writeGroup(msgType int, msg string) error {
+func (c *SyncController) writeGroup(msgType int, msg string) error {
 	msgs := []byte(msg)
 	users.RLockFunc(func(m map[interface{}]interface{}) {
 		for user := range m {
@@ -80,7 +74,7 @@ func writeGroup(msgType int, msg string) error {
 }
 
 // 向客户端返回用户列表
-func writeUsers() error {
+func (c *SyncController) writeUsers() error {
 	nameStr := ""
 	names.Iterator(func(v string) bool {
 		if nameStr == "" {
@@ -94,7 +88,7 @@ func writeUsers() error {
 		"\"clientId\":\"0\"," +
 		"\"msg\":\"" + nameStr + "\"" +
 		"}"
-	if err := writeGroup(1, msgs); err != nil {
+	if err := c.writeGroup(1, msgs); err != nil {
 		return err
 	}
 	return nil

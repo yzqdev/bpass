@@ -20,8 +20,9 @@
     </q-header>
 
     <q-drawer
+      elevated
       v-model="leftDrawerOpen"
-      show-if-above
+
       bordered
     >
       <q-list>

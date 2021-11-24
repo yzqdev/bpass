@@ -5,11 +5,12 @@
       inline-label
       class="bg-purple text-white shadow-2"
     >
-      <q-tab name="mails" icon="mail" label="首页">
+      <q-route-tab name="mails" icon="mail" label="首页" to="/home">
 
-      </q-tab>
-      <q-tab name="alarms" icon="alarm" label="传输"/>
-      <q-tab name="movies" icon="movie" label="扫码"/>
+      </q-route-tab>
+      <q-route-tab name="alarms" icon="alarm" label="上传文件" to="/transfer"/>
+      <q-route-tab name="text" icon="alarm" label='传输文本' to="/text"/>
+      <q-route-tab name="movies" icon="movie" label="聊天" to="/chat"/>
     </q-tabs>
     <q-separator/>
 
@@ -48,13 +49,47 @@
       </q-tab-panel>
 
       <q-tab-panel name="alarms">
-        <div class="text-h6">Alarms</div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-      </q-tab-panel>
+        <q-card>
+          <q-card-section>
+            <article>
+              <q-input style="max-width: 30rem" v-model="text" label="自定义上传子目录" counter dense>
+                <template v-slot:prepend>
+                  /
+                </template>
+                <template v-slot:append>
+                  /
+                </template>
 
+
+              </q-input>
+              <q-uploader
+                style="max-width: 30rem;max-height: 50rem;"
+                :url="`http://localhost:8901/api/upload?path=${text}`"
+                @failed="showFail"
+                label="批量上传"
+                multiple
+                fieldName="file"
+                batch
+
+              />
+            </article>
+          </q-card-section>
+        </q-card>
+      </q-tab-panel>
+      <q-tab-panel name="text">
+        <q-card>
+          <q-card-section>
+            <q-input
+              v-model="wsText"
+              filled
+              @mouseout="setText"
+              type="textarea"
+            />
+          </q-card-section>
+        </q-card>
+      </q-tab-panel>
       <q-tab-panel name="movies">
-        <div class="text-h6">Movies</div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+        聊天
       </q-tab-panel>
     </q-tab-panels>
   </q-page>
@@ -74,18 +109,37 @@ export default defineComponent({
       ips: [],
       pathRoot: '',
       fileList: [],
-      baseUrl
+      baseUrl, text: '', wsText: '', ws: ''
     }
-  }, methods: {
+  },
+  watch: {
+    "$route": function (val) {
+      if (val) {
+        this.getFileList()
+      }
+    }
+  },
+  methods: {
+    setText() {
+      api.post('/api/textdata', {data: this.wsText, code: 1}).then(({data}) => {
+        this.syncSend("reload_text")
+      })
+    },
+    syncSend(data) {
+      this.ws.send(data);
+    },
     openUrl(url) {
 
       api.get('/api/openurl?url=' + url).then(({data}) => {
         useQuasar().notify("在主电脑打开目录成功!")
       })
     },
+    showFail(err) {
+      console.log(err)
+    },
+
     getFileList() {
       api.get("/fileList").then(({data}) => {
-        console.log(data)
         this.pathRoot = data.pathRoot
         this.ips = data.ips
         this.fileList = data.fileList
@@ -95,10 +149,39 @@ export default defineComponent({
       api.get('/api/delete?f=' + item.path).then((data) => {
         this.getFileList()
       })
+    },
+    syncDo(data) {
+      let msg = data.msg;
+      console.log(data )
+      console.log("[syncDo]接受信息" , data);
+      if (msg === 'reload_text') {
+        api.post("/api/textdata", {},
+          (result) => {
+            this.wsText = result.data;
+          });
+      }
     }
   }, created() {
 
     this.getFileList()
+  }, mounted() {
+    console.log('mounted 时间')
+    api.post("/api/textdata", {},
+      (result) => {
+        console.log("mounted:textdata:" + JSON.stringify(result.data));
+        this.ws = result.data;
+      }).catch((err ) => {
+        console.error(err)
+      });
+    let that = this
+    this.ws = new WebSocket("ws://" + baseUrl.replace("http://", "") + "/sync/web-socket");
+    this.ws.onmessage = function (result) {
+      let data = JSON.parse(result.data);
+      console.log("onmessage 0",data)
+      //消息接收由载入页面实现
+      that.syncDo(data)
+    };
+
   }
 })
 </script>

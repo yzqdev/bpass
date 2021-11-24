@@ -16,7 +16,6 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   function (response) {
     // 对响应数据做点什么
-    console.log("进入response");
     let { data } = response;
     return data;
   },

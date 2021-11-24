@@ -15,7 +15,7 @@ import (
 	"log"
 )
 
-// Controller 控制器结构体
+// SyncController 控制器结构体
 
 // Msg 消息结构体
 type Msg struct {
