@@ -43,10 +43,25 @@ type Text struct {
 	Data string `json:"data"`
 	Code string `json:"code"`
 }
+var dataText="data_text"
 
-// GetTextData 文本内容共享
+// SendTextData   文本内容发送
+func SendTextData(r *ghttp.Request) {
+	var req *Text
+	if err := r.Parse(&req); err != nil {
+		response.JSON(r, 400, "二重唱")
+		return
+	}
+	getData := req.Data
+
+	fileinfos.Set(dataText, getData)
+	response.JSON(r, 0, "ok", "已发送")
+
+}
+// GetTextData 文本内容获取
 func GetTextData(r *ghttp.Request) {
-	saveData(r, "data", "data_text")
+	dbData := fileinfos.Get(dataText)
+	response.JSON(r, 0, "ok", dbData)
 }
 
 // saveData 保存数据到文件

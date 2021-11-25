@@ -20,6 +20,7 @@ func init() {
 		group.Group("/", func(group *ghttp.RouterGroup) {
 			group.GET("/fileList", api.FileLists)
 			group.GET("/index", api.Index)
+			group.GET("/ips", api.Ips)
 			group.POST("/upload", api.MultiUpload)
 		})
 

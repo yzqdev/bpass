@@ -18,7 +18,22 @@
         <div @click="showQrCode">Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
+    <q-dialog v-model="qrCodeShow">
+      <q-card style="min-width: 20rem">
+        <q-card-section>
+          <div class="text-h6">二维码</div>
+        </q-card-section>
 
+        <q-card-section class="q-pt-none">
+          <q-select @update:model-value="ipChange" outlined v-model="ip" :options="options" label="ip地址"/>
+          <Qrcode :ip="ip"></Qrcode>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="primary" v-close-popup/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <q-drawer
       elevated
       v-model="leftDrawerOpen"
@@ -95,34 +110,48 @@ const linksList = [
 ];
 
 import {defineComponent, ref} from 'vue'
-import {useQuasar} from 'quasar'
+
+import {onMounted} from 'vue'
+import {api} from "boot/axios";
+import Qrcode from "components/Qrcode.vue";
 
 export default defineComponent({
   name: 'MainLayout',
 
   components: {
-    EssentialLink
+    Qrcode,
+    EssentialLink,
   },
 
   setup() {
     const leftDrawerOpen = ref(false)
+    let qrCodeShow = ref(false)
+    let ip = ref("")
+    let options = ref([])
 
     function showQrCode() {
-      useQuasar().dialog({title: "二维码", message: 'ksfjklsskf'}).onOk(() => {
-        // console.log('OK')
-      }).onCancel(() => {
-        // console.log('Cancel')
-      }).onDismiss(() => {
-        // console.log('I am triggered on both OK and Cancel')
-      })
+      ip.value = options.value[0]
+      qrCodeShow.value = true
+
     }
 
+    function ipChange(value) {
+      console.log(value)
+      ip.value = value
+    }
+
+    onMounted(() => {
+      api.get("/ips").then(({data}) => {
+        console.log(data)
+        options.value = data.ips
+      })
+    })
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value
-      }, showQrCode
+      }, showQrCode, qrCodeShow, ip, options, ipChange
     }
   }
 })

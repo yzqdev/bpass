@@ -30,6 +30,9 @@
         </q-card>
         <p></p>
         <q-space/>
+        <article v-if="inDir">
+          <q-btn color="red" @click="back">返回</q-btn>
+        </article>
         <article class="file-card-container row">
           <q-card class="file-card col-xs-12 col-sm-6 col-md-4" v-for="(item,index) in fileList">
             <q-card-section>
@@ -37,8 +40,10 @@
               <q-separator/>
               <article class="img-container" v-if="item.type=='img'"><img :src="`${baseUrl}/files${item.path}`"
                                                                           :alt="item.name"/></article>
+
               <article class="img-container" v-else>
-                <div> {{ item.ext }}</div>
+                <div v-if="item.ext=='dir'" @click="showDir(item)" class="dir-div"> {{ item.ext }}</div>
+                <div v-else> {{ item.ext }}</div>
               </article>
               <article class="file-footer"><span>{{ item.ext }}</span><span>{{ item.sizes }}</span> <span
                 class="delete-btn"><q-btn
@@ -101,6 +106,7 @@ import {api} from "boot/axios";
 import {useQuasar} from 'quasar'
 import {baseUrl} from "boot/axios";
 
+let ws = new WebSocket("ws://" + baseUrl.replace("http://", "") + "/sync/web-socket");
 export default defineComponent({
   name: 'PageIndex',
   data() {
@@ -109,7 +115,7 @@ export default defineComponent({
       ips: [],
       pathRoot: '',
       fileList: [],
-      baseUrl, text: '', wsText: '', ws: ''
+      baseUrl, text: '', wsText: '', ws: ws, inDir: false, inPath: ''
     }
   },
   watch: {
@@ -122,8 +128,8 @@ export default defineComponent({
   methods: {
     setText() {
       console.log("移出文本框")
-      api.post('/api/textdata', {data: this.wsText }).then(({data}) => {
-        console.log("发送数据",data)
+      api.post('/api/textdata', {data: this.wsText}).then(({data}) => {
+        console.log("发送数据", data)
         this.syncSend("reload_text")
       })
     },
@@ -152,6 +158,24 @@ export default defineComponent({
         this.getFileList()
       })
     },
+    showDir(item) {
+      this.inDir = true
+
+      api.get("/fileList?path=" + item.path).then(({data}) => {
+        this.pathRoot = data.pathRoot
+        this.ips = data.ips
+        this.fileList = data.fileList
+        this.inPath = item.path
+      })
+    },
+    back() {
+      this.inDir = false
+      api.get("/fileList").then(({data}) => {
+        this.pathRoot = data.pathRoot
+        this.ips = data.ips
+        this.fileList = data.fileList
+      })
+    },
     syncDo(data) {
       let msg = data.msg;
       console.log("[syncDo]接受信息", data);
@@ -178,7 +202,7 @@ export default defineComponent({
     });
 
     let that = this
-    this.ws = new WebSocket("ws://" + baseUrl.replace("http://", "") + "/sync/web-socket");
+
     this.ws.onmessage = function (result) {
       let data = JSON.parse(result.data);
       console.log("onmessage 0", data)
@@ -195,10 +219,20 @@ export default defineComponent({
   .file-card {
     .img-container {
       margin: 1rem;
+      height: 8rem;
       display: flex;
       justify-content: center;
       align-items: center;
 
+      .dir-div {
+        cursor: pointer;
+        border-radius: 0.3rem;
+        width: 4rem;
+        height: 2rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 2rem;
+        background: #1976D2;
+      }
 
       div {
         display: flex;
@@ -210,6 +244,7 @@ export default defineComponent({
 
 
       img {
+        cursor: pointer;
         height: 8rem;
       }
     }

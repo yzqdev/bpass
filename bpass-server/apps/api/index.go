@@ -17,7 +17,20 @@ func Index(r *ghttp.Request) {
 	}
 	response.JSON(r, 200, "success", data)
 }
+func Ips(r *ghttp.Request)  {
+	port := boot.ServPort
+	ip, _ := ipaddress.GetIP()
+	var ips []string
+	for _, pp := range ip {
+		ips = append(ips, pp+":"+strconv.Itoa(port))
+	}
+	data := map[string]interface{}{
+		"ips":       ips,
 
+	}
+	response.JSON(r, 200, "成功", data)
+
+}
 func FileLists(r *ghttp.Request) {
 	// Ip lists
 	port := boot.ServPort
