@@ -121,15 +121,17 @@ export default defineComponent({
   },
   methods: {
     setText() {
-      api.post('/api/textdata', {data: this.wsText, code: 1}).then(({data}) => {
+      console.log("移出文本框")
+      api.post('/api/textdata', {data: this.wsText }).then(({data}) => {
+        console.log("发送数据",data)
         this.syncSend("reload_text")
       })
     },
     syncSend(data) {
+      console.log("syncsend")
       this.ws.send(data);
     },
     openUrl(url) {
-
       api.get('/api/openurl?url=' + url).then(({data}) => {
         useQuasar().notify("在主电脑打开目录成功!")
       })
@@ -152,32 +154,34 @@ export default defineComponent({
     },
     syncDo(data) {
       let msg = data.msg;
-      console.log(data )
-      console.log("[syncDo]接受信息" , data);
+      console.log("[syncDo]接受信息", data);
       if (msg === 'reload_text') {
-        api.post("/api/textdata", {},
-          (result) => {
-            this.wsText = result.data;
-          });
+        api.get("/api/textdata",
+        ).then((result) => {
+          console.log("接受消息成功 ", result)
+          this.wsText = result.data;
+        }).catch((err) => {
+          console.error(err)
+        });
       }
     }
   }, created() {
 
     this.getFileList()
-  }, mounted() {
-    console.log('mounted 时间')
-    api.post("/api/textdata", {},
-      (result) => {
-        console.log("mounted:textdata:" + JSON.stringify(result.data));
-        this.ws = result.data;
-      }).catch((err ) => {
-        console.error(err)
-      });
+  },
+  mounted() {
+    api.get("/api/textdata").then((result) => {
+      console.log("mounted:textdata:" + JSON.stringify(result.data));
+      this.wsText = result.data;
+    }).catch((err) => {
+      console.error(err)
+    });
+
     let that = this
     this.ws = new WebSocket("ws://" + baseUrl.replace("http://", "") + "/sync/web-socket");
     this.ws.onmessage = function (result) {
       let data = JSON.parse(result.data);
-      console.log("onmessage 0",data)
+      console.log("onmessage 0", data)
       //消息接收由载入页面实现
       that.syncDo(data)
     };

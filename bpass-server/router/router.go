@@ -35,7 +35,8 @@ func init() {
 			//server
 			g.GET("/globalData", api.GlobalData)
 			g.ALL("/subpath", api.GetSubPath)
-			g.ALL("/textdata", api.GetTextData)
+			g.POST("/textdata", api.SendTextData)
+			g.GET("/textdata", api.GetTextData)
 			g.GET("/openurl", api.OpenUrl)
 
 		})

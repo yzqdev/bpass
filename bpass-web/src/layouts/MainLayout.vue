@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-         bpass
+          bpass
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div @click="showQrCode">Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -41,7 +41,7 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>
@@ -94,7 +94,8 @@ const linksList = [
   }
 ];
 
-import { defineComponent, ref } from 'vue'
+import {defineComponent, ref} from 'vue'
+import {useQuasar} from 'quasar'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -103,15 +104,25 @@ export default defineComponent({
     EssentialLink
   },
 
-  setup () {
+  setup() {
     const leftDrawerOpen = ref(false)
+
+    function showQrCode() {
+      useQuasar().dialog({title: "二维码", message: 'ksfjklsskf'}).onOk(() => {
+        // console.log('OK')
+      }).onCancel(() => {
+        // console.log('Cancel')
+      }).onDismiss(() => {
+        // console.log('I am triggered on both OK and Cancel')
+      })
+    }
 
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
-      toggleLeftDrawer () {
+      toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      }, showQrCode
     }
   }
 })
