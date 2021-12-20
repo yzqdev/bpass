@@ -4,14 +4,11 @@ import (
 	"b0pass/apps/api"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
-	"github.com/gookit/color"
 )
 
 func init() {
 	s := g.Server()
 
-	// Index
-	color.Redln("刀刀赚了")
 	// Chat
 	//s.BindHandler("/chat", new(chat.SyncController))
 	s.BindObject("/sync ", new(api.SyncController))

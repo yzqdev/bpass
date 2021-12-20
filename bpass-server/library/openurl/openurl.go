@@ -19,7 +19,7 @@ func Open(uri string) error {
 	//runtime.GOOS
 	run, ok := commands[runtime.GOOS]
 	if !ok {
-		return fmt.Errorf("don't know how to open things on %s platform", runtime.GOOS)
+		return fmt.Errorf("不存在的操作系统-> %s platform", runtime.GOOS)
 	}
 	//exec.Command
 	run = run + uri
