@@ -11,7 +11,7 @@ const { configure } = require('quasar/wrappers');
 module.exports = configure(function (ctx) {
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
-    supportTS: false,
+    supportTS: true,
 
     // https://quasar.dev/quasar-cli/prefetch-feature
     // preFetch: true,
@@ -21,6 +21,7 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
       'axios',
+      "main"
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -72,8 +73,10 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
-      https: false,
-      port: 8900,
+      server: {
+        type: 'http'
+      },
+      port: 8080,
       open: true // opens browser window automatically
     },
 
@@ -92,9 +95,7 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: [
-        'Dialog'
-      ]
+      plugins: []
     },
 
     // animations: 'all', // --- includes all animations
@@ -112,7 +113,7 @@ module.exports = configure(function (ctx) {
                       // (gets superseded if process.env.PORT is specified at runtime)
 
       maxAge: 1000 * 60 * 60 * 24 * 30,
-        // Tell browser when a file from the server should expire from cache (in ms)
+      // Tell browser when a file from the server should expire from cache (in ms)
 
       chainWebpackWebserver (/* chain */) {
         //
@@ -138,7 +139,7 @@ module.exports = configure(function (ctx) {
       manifest: {
         name: `Quasar App`,
         short_name: `Quasar App`,
-        description: `A Quasar Framework app`,
+        description: `myblog front `,
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
@@ -207,7 +208,7 @@ module.exports = configure(function (ctx) {
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      chainWebpackMain (/* chain */) {
+      chainWebpack (/* chain */) {
         // do something with the Electron main process Webpack cfg
         // extendWebpackMain also available besides this chainWebpackMain
       },
