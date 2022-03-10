@@ -3,22 +3,24 @@ package boot
 import (
 	"b0pass/library/fileinfos"
 	"flag"
-	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/os/gfile"
-	"github.com/gogf/gf/os/glog"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gfile"
+	"github.com/gogf/gf/v2/os/glog"
 	"time"
 )
-
 
 var (
 	PathRoot string
 	ServPort int
 )
+var ctx = gctx.New()
 
 func ExecArgs() {
 	flag.Parse()
 	if ServPort <= 0 {
-		ServPort =g.Cfg().GetInt("setting.port")
+		env, _ := g.Cfg().GetWithEnv(ctx, "setting.port")
+		ServPort = env.Int()
 	}
 }
 
@@ -50,14 +52,14 @@ func init() {
 		v.SetDelimiters("${", "}")
 
 		// glog配置
-		logpath := c.GetString("setting.logpath")
-		_ = glog.SetPath(logpath)
+		logpath, _ := c.Get(ctx, "setting.logpath")
+		_ = glog.SetPath(logpath.String())
 		glog.SetStdoutPrint(true)
 
 		// Web Server配置
 		s.SetIndexFolder(true)
 		s.SetServerRoot("public")
-		s.SetLogPath(logpath)
+		s.SetLogPath(logpath.String())
 		s.SetReadTimeout(3 * 60 * time.Second)
 		s.SetWriteTimeout(3 * 60 * time.Second)
 		s.SetIdleTimeout(3 * 60 * time.Second)

@@ -2,32 +2,39 @@ package fileinfos
 
 import (
 	"fmt"
-	"github.com/gogf/gf/os/gcache"
-	"github.com/gogf/gf/os/gfile"
+	"github.com/gogf/gf/v2/os/gcache"
+	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/gfile"
 )
+
+var ctx = gctx.New()
 
 // Init DataInit 从文件恢复为缓存
 func Init(keys ...string) {
 	fmt.Println(keys)
 	for _, key := range keys {
 		data := gfile.GetContents(cacheFile(key))
-		gcache.Set(key, data, 0)
+		gcache.Set(ctx, key, data, 0)
 	}
 }
 
 // Set DataSet 设置缓存
 func Set(key, value string) {
-	gcache.Set(key, value, 0)
+
+	err := gcache.Set(ctx, key, value, 0)
+	if err != nil {
+		return
+	}
 	_ = gfile.PutContents(cacheFile(key), value)
 }
 
 // Get DataGet 读取缓存
 func Get(key string) string {
-	get, err := gcache.Get(key)
+	cacheGet, err := gcache.Get(ctx, key)
 	if err != nil {
 		panic("go cache get fail!!")
 	}
-	return get.(string)
+	return cacheGet.String()
 }
 
 // cacheFile 缓存实例化文件

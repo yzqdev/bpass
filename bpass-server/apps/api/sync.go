@@ -1,21 +1,25 @@
 package api
 
 import (
-	"github.com/gogf/gf/net/ghttp"
-	"github.com/gogf/gf/os/glog"
+	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gctx"
+	"github.com/gogf/gf/v2/os/glog"
 )
 
 type SyncController struct {
 	ws *ghttp.WebSocket
 }
 
+var ctx = gctx.New()
 var ()
 
 // Index 触发页面
 // /sync/
 func (c *SyncController) Index(r *ghttp.Request) {
-	if !r.Session.Contains("clientId") {
-		_ = r.Session.Set("clientId", r.Session.Id())
+	contains, _ := r.Session.Contains("clientId")
+	sid, _ := r.Session.Id()
+	if !contains {
+		_ = r.Session.Set("clientId", sid)
 	}
 	//_ = c.View.Display("sync.html")
 }
@@ -28,33 +32,34 @@ func (c *SyncController) WebSocket(r *ghttp.Request) {
 	if ws, err := r.WebSocket(); err == nil {
 		c.ws = ws
 	} else {
-		glog.Error(err)
+		glog.Error(ctx, err)
 		return
 	}
 
 	// 初始化时设置用户信息
-	clientId := r.Session.GetString("clientId")
-	if clientId == "" {
-		_ = r.Session.Set("clientId", r.Session.Id())
+	clientId, _ := r.Session.Get("clientId")
+	if clientId.String() == "" {
+		id, _ := r.Session.Id()
+		_ = r.Session.Set("clientId", id)
 	}
 	users.Set(c.ws, clientId)
-	names.Add(clientId)
+	names.Add(clientId.String())
 
 	for {
 		// 阻塞读取WS数据
 		msgType, msg, err := c.ws.ReadMessage()
 		if err != nil {
 			users.Remove(c.ws)
-			names.Remove(clientId)
+			names.Remove(clientId.String())
 			break
 		}
 
 		// 群发同步所有端
-		glog.Cat("sync").Println("[sync] ", clientId, msg)
+		glog.Cat("sync").Print(ctx, "[sync] ", clientId, msg)
 		_ = c.writeUsers()
 		if msg != nil {
 			msgs := "{" +
-				"\"clientId\":\"" + clientId + "\"," +
+				"\"clientId\":\"" + clientId.String() + "\"," +
 				"\"msg\":\"" + string(msg) + "\"" +
 				"}"
 			_ = c.writeGroup(msgType, msgs)

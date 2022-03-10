@@ -6,13 +6,13 @@ import (
 	"b0pass/library/ipaddress"
 	"b0pass/library/openurl"
 	"b0pass/library/response"
-	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/v2/net/ghttp"
 	"strconv"
 )
 
 // OpenUrl 打开本地url
 func OpenUrl(r *ghttp.Request) {
-	getUrl := r.GetString("url")
+	getUrl := r.GetQuery("url").String()
 	_ = openurl.Open(getUrl)
 }
 
@@ -43,7 +43,8 @@ type Text struct {
 	Data string `json:"data"`
 	Code string `json:"code"`
 }
-var dataText="data_text"
+
+var dataText = "data_text"
 
 // SendTextData   文本内容发送
 func SendTextData(r *ghttp.Request) {
@@ -58,6 +59,7 @@ func SendTextData(r *ghttp.Request) {
 	response.JSON(r, 0, "ok", "已发送")
 
 }
+
 // GetTextData 文本内容获取
 func GetTextData(r *ghttp.Request) {
 	dbData := fileinfos.Get(dataText)

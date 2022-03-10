@@ -4,9 +4,9 @@ import (
 	"b0pass/library/fileinfos"
 	"b0pass/library/response"
 	"fmt"
-	"github.com/gogf/gf/net/ghttp"
-	"github.com/gogf/gf/os/gfile"
-	"github.com/gogf/gf/util/gconv"
+	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/gfile"
+	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/gookit/color"
 	"io"
 	"log"
@@ -24,7 +24,7 @@ func Upload(r *ghttp.Request) {
 	//defer func() { _ = file.close() }()
 
 	// Get path
-	pathSub := r.GetString("path")
+	pathSub := r.GetQuery("path").String()
 	fileinfos.Set("data_path", pathSub)
 	// Save path
 	savePath := fileinfos.GetRootPath() + "/files/" + pathSub + "/"

@@ -1,6 +1,6 @@
 package router
 
-import "github.com/gogf/gf/net/ghttp"
+import "github.com/gogf/gf/v2/net/ghttp"
 
 // MiddlewareCORS 解决跨域问题
 func MiddlewareCORS(r *ghttp.Request) {

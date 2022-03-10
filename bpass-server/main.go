@@ -5,7 +5,8 @@ import (
 	_ "b0pass/boot"
 	_ "b0pass/router"
 	"fmt"
-	"github.com/gogf/gf/frame/g"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/zserge/lorca"
 	"log"
 	"os"
@@ -64,11 +65,13 @@ func execUI() {
 	defer func() {
 		_ = ui.Close()
 	}()
-
+	var ctx = gctx.New()
 	// Load url
+	env, err := g.Cfg().GetWithEnv(ctx, "setting.port")
+
 	_ = ui.Load(fmt.Sprintf(
 		"http://%s",
-		"127.0.0.1:"+g.Config().GetString("setting.port")),
+		"127.0.0.1:"+env.String()),
 	)
 
 	// Wait until the interrupt signal arrives
