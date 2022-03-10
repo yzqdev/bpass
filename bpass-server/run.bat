@@ -1,1 +1,1 @@
-gf run  main.go
+gf run  main.go -p bin
