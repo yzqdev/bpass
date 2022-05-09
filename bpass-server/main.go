@@ -3,6 +3,7 @@ package main
 import (
 	"b0pass/boot"
 	_ "b0pass/boot"
+	_ "b0pass/packed"
 	_ "b0pass/router"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"

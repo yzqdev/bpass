@@ -12,6 +12,9 @@ func init() {
 	// Chat
 	//s.BindHandler("/chat", new(chat.SyncController))
 	s.BindObject("/sync ", new(api.SyncController))
+	s.BindHandler("/", func(r *ghttp.Request) {
+		r.Response.RedirectTo("/spa/")
+	})
 	s.Group("/", func(group *ghttp.RouterGroup) {
 		group.Middleware(MiddlewareCORS)
 		group.Group("/", func(group *ghttp.RouterGroup) {

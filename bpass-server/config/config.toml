@@ -1,9 +1,21 @@
 # 应用系统设置
+openapiPath= "/api.json"
+swaggerPath= "/swagger"
 [setting]
     logpath = "tmp/log"
     port    = 8901
-[server]
-
-
-openapiPath= "/api.json"
-swaggerPath= "/swagger"
+# 下面是静态文件,不是embed
+#[server]
+#ServerRoot = "public/spa"
+#[viewer]
+#DefaultFile = "index.tpl"
+#Delimiters  = ["${", "}"]
+[gfcli]
+# 工具编译配置
+[gfcli.build]
+name     = "bpass-server"
+arch     = "amd64"
+system   = "linux,windows"
+pack     = "public"
+mod      = ""
+cgo      = 0

@@ -40,7 +40,8 @@ func init() {
 	go func() {
 
 		// APP核心引擎
-		v := g.View()
+		//template文件夹用于非spa
+		//v := g.View()
 		c := g.Config()
 		s := g.Server()
 
@@ -48,8 +49,8 @@ func init() {
 		time.Sleep(3000 * time.Millisecond)
 
 		// 模板引擎配置
-		_ = v.AddPath("template")
-		v.SetDelimiters("${", "}")
+		//_ = v.AddPath("template")
+		//v.SetDelimiters("${", "}")
 
 		// glog配置
 		logpath, _ := c.Get(ctx, "setting.logpath")
@@ -58,7 +59,8 @@ func init() {
 
 		// Web Server配置
 		s.SetIndexFolder(true)
-		s.SetServerRoot("public")
+		//s.SetAddr("0.0.0.0" + strconv.Itoa(ServPort))
+		//s.SetServerRoot("public")
 		s.SetLogPath(logpath.String())
 		s.SetReadTimeout(3 * 60 * time.Second)
 		s.SetWriteTimeout(3 * 60 * time.Second)
@@ -77,7 +79,7 @@ func init() {
 			}
 		}
 		s.AddStaticPath("/files", filePath)
-
+		s.AddStaticPath("/spa", "public")
 		// Run Server
 		g.Server().Run()
 	}()

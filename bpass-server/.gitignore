@@ -1,8 +1,11 @@
 .DS_Store
 .idea
 tmp
+temp
 *.log
 boot/resource.go
 bin
 go.sum
 *.exe
+spa/
+public/
