@@ -1,15 +1,11 @@
 <template>
-<div>
-  filelist
-</div>
+  <div>filelist</div>
 </template>
 
 <script>
 export default {
-  name: "FileList"
-}
+  name: "FileList",
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

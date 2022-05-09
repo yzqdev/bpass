@@ -1,18 +1,17 @@
-import { boot } from 'quasar/wrappers'
-import axios, {AxiosInstance} from 'axios'
+import { boot } from "quasar/wrappers";
+import axios, { AxiosInstance } from "axios";
 
-import qs from 'qs'
-declare module '@vue/runtime-core' {
+import qs from "qs";
+declare module "@vue/runtime-core" {
   interface ComponentCustomProperties {
     $axios: AxiosInstance;
   }
 }
-export const baseUrl='http://localhost:8901'
-const api = axios.create({ baseURL: baseUrl })
+export const baseURL = "http://192.168.0.102:8901";
+const api = axios.create({ baseURL: baseURL });
 api.interceptors.request.use((config) => {
-
-  return config
-})
+  return config;
+});
 api.interceptors.response.use(
   function (response) {
     // 对响应数据做点什么
@@ -27,13 +26,13 @@ api.interceptors.response.use(
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
-  app.config.globalProperties.$axios = axios
+  app.config.globalProperties.$axios = axios;
   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
   //       so you won't necessarily have to import axios in each vue file
 
-  app.config.globalProperties.$api = api
+  app.config.globalProperties.$api = api;
   // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
   //       so you can easily perform requests against your app's API
-})
+});
 
-export { api }
+export { api };

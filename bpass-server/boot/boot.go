@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/gogf/gf/v2/os/gfile"
 	"github.com/gogf/gf/v2/os/glog"
+	"strconv"
 	"time"
 )
 
@@ -59,7 +60,7 @@ func init() {
 
 		// Web Server配置
 		s.SetIndexFolder(true)
-		//s.SetAddr("0.0.0.0" + strconv.Itoa(ServPort))
+		s.SetAddr("0.0.0.0:" + strconv.Itoa(ServPort))
 		//s.SetServerRoot("public")
 		s.SetLogPath(logpath.String())
 		s.SetReadTimeout(3 * 60 * time.Second)
@@ -68,7 +69,7 @@ func init() {
 		s.SetMaxHeaderBytes(32 * 1024)
 		s.SetErrorLogEnabled(true)
 		s.SetAccessLogEnabled(true)
-		s.SetPort(ServPort)
+		//s.SetPort(ServPort)
 		//s.SetDumpRouteMap(false)
 
 		// 文件根目录

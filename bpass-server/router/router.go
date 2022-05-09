@@ -2,16 +2,38 @@ package router
 
 import (
 	"b0pass/apps/api"
+	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	"github.com/gogf/gf/v2/os/glog"
+	"github.com/gookit/color"
 )
 
 func init() {
 	s := g.Server()
 
 	// Chat
-	//s.BindHandler("/chat", new(chat.SyncController))
-	s.BindObject("/sync ", new(api.SyncController))
+	s.BindHandler("/ws", func(r *ghttp.Request) {
+		var ctx = r.Context()
+		ws, err := r.WebSocket()
+		if err != nil {
+			glog.Error(ctx, err)
+			r.Exit()
+		}
+
+		for {
+			msgType, msg, err := ws.ReadMessage()
+			fmt.Println(string(msg))
+			if err != nil {
+				return
+			}
+
+			if err = ws.WriteMessage(msgType, msg); err != nil {
+				color.Redln("返回值错误")
+				return
+			}
+		}
+	})
 	s.BindHandler("/", func(r *ghttp.Request) {
 		r.Response.RedirectTo("/spa/")
 	})

@@ -6,9 +6,10 @@
   "author": "yzqdev <yzqdev@outlook.com>",
   "private": true,
   "scripts": {
-    "dev": "quasar dev",
+    "dev": "quasar dev -p 9020",
     "build": "quasar build",
-    "build:pwa": "quasar build -m pwa"
+    "build:pwa": "quasar build -m pwa",
+    "lint": "prettier --write src/**/*.{vue,ts,js,tsx,jsx,css,scss}"
   },
   "dependencies": {
     "@quasar/extras": "^1.13.6",
@@ -16,7 +17,9 @@
     "axios": "^0.27.2",
     "core-js": "^3.22.4",
     "dayjs": "^1.11.2",
+    "prettier": "^2.6.2",
     "quasar": "^2.6.6",
+    "vconsole": "^3.14.6",
     "vue": "^3.2.33",
     "vue-router": "^4.0.15",
     "vuex": "^4.0.2"
